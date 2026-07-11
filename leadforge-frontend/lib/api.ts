@@ -113,7 +113,7 @@ export async function generateLeads(data: {
   limit: number;
 }) {
   return request<any[]>(
-    "/generate-leads",
+    "/leads/generate-leads",
     {
       method: "POST",
       body: JSON.stringify(data),
@@ -158,7 +158,7 @@ export async function updateLeadStatus(
     },
     true
   );
-  
+
   return { ...lead, status };
 }
 

@@ -2,8 +2,11 @@ from fastapi import APIRouter, Depends, status, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from typing import List
-from app.auth.dependencies.auth import get_current_user
+import uuid
 
+from app.auth.dependencies.auth import get_current_user
+from app.schemas.lead import LeadGenerationRequest
+from app.models.lead import Lead
 from app.database.db import get_db
 from app.schemas.lead import LeadCreate, LeadResponse
 from app.crud.lead import (
@@ -18,6 +21,39 @@ router = APIRouter(
     prefix="/leads",
     tags=["Leads"]
 )
+
+
+
+
+@router.post("/generate-leads")
+def generate_leads(
+    payload: LeadGenerationRequest,
+    db: Session = Depends(get_db)
+):
+    generated = []
+
+    for i in range(payload.limit):
+        lead = Lead(
+            name=f"{payload.keyword.title()} Business {i+1}",
+            email=f"{uuid.uuid4().hex[:8]}@{payload.keyword.lower()}.com",
+            phone=f"+91 900000{i:04}",
+            source=f"{payload.keyword} - {payload.location}",
+            status="new"
+        )
+
+        db.add(lead)
+        generated.append(lead)
+
+    db.commit()
+
+    for lead in generated:
+        db.refresh(lead)
+
+    return generated
+
+
+
+
 
 @router.post("/", response_model=LeadResponse, status_code=status.HTTP_201_CREATED)
 def create_new_lead(

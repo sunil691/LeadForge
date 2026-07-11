@@ -39,4 +39,3 @@ app.include_router(lead_router)
 def health_check():
     return{"status":"LeadForge backend is running"}
 app.include_router(auth_router)
-app.include_router(lead_router)

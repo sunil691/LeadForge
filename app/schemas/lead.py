@@ -18,3 +18,11 @@ class LeadResponse(LeadBase):
 
     class Config:
         from_attributes = True
+
+
+from pydantic import BaseModel
+
+class LeadGenerationRequest(BaseModel):
+    keyword: str
+    location: str
+    limit: int = 10
